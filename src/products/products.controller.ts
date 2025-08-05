@@ -7,19 +7,21 @@ import {
   Param,
   Delete,
   ParseUUIDPipe,
+  Query,
 } from '@nestjs/common';
 
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { PaginationDto } from '@common/dtos/pagination.dto';
 
 @Controller('products')
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  async findAll() {
-    const products = await this.productsService.findAll();
+  async findAll(@Query() paginationDto: PaginationDto) {
+    const products = await this.productsService.findAll(paginationDto);
 
     return {
       data: products,

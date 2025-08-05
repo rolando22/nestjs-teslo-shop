@@ -11,6 +11,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
+      "@common/*": ["src/common/*"],
       "@products/*": ["src/products/*"]
     },
     "incremental": true,
