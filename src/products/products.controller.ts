@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 
 import { ProductsService } from './products.service';
@@ -16,19 +17,32 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productsService.create(createProductDto);
-  }
-
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  async findAll() {
+    const products = await this.productsService.findAll();
+
+    return {
+      data: products,
+    };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productsService.findOne(+id);
+  async findOne(@Param('id', ParseUUIDPipe) id: string) {
+    const product = await this.productsService.findOne(id);
+
+    return {
+      data: product,
+    };
+  }
+
+  @Post()
+  async create(@Body() createProductDto: CreateProductDto) {
+    const newProduct = await this.productsService.create(createProductDto);
+
+    return {
+      message: 'Product created successfully',
+      data: newProduct,
+    };
   }
 
   @Patch(':id')
@@ -37,7 +51,11 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productsService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const product = await this.productsService.remove(id);
+    return {
+      message: 'Product deleted successfully',
+      data: product,
+    };
   }
 }
