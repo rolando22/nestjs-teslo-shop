@@ -28,9 +28,9 @@ export class ProductsController {
     };
   }
 
-  @Get(':id')
-  async findOne(@Param('id', ParseUUIDPipe) id: string) {
-    const product = await this.productsService.findOne(id);
+  @Get(':term')
+  async findOne(@Param('term') term: string) {
+    const product = await this.productsService.findOne(term);
 
     return {
       data: product,
@@ -53,8 +53,9 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
+  async remove(@Param('id', ParseUUIDPipe) id: string) {
     const product = await this.productsService.remove(id);
+
     return {
       message: 'Product deleted successfully',
       data: product,

@@ -38,11 +38,23 @@ export class ProductsService {
     return products;
   }
 
-  async findOne(id: string): Promise<Product> {
-    const product = await this.productRepository.findOneBy({ id });
+  async findOne(term: string): Promise<Product> {
+    let product: Product | null = null;
+
+    if (this.isUUID(term)) {
+      product = await this.productRepository.findOneBy({ id: term });
+    } else {
+      const queryBuilder = this.productRepository.createQueryBuilder();
+      product = await queryBuilder
+        .where('UPPER(title) =:title or slug =:slug', {
+          title: term.toUpperCase(),
+          slug: term.toLowerCase(),
+        })
+        .getOne();
+    }
 
     if (!product) {
-      throw new NotFoundException(`Product with id "${id}" not found`);
+      throw new NotFoundException(`Product with "${term}" not found`);
     }
 
     return product;
@@ -66,6 +78,12 @@ export class ProductsService {
     const product = await this.findOne(id);
     await this.productRepository.remove(product);
     return product;
+  }
+
+  private isUUID(id: string): boolean {
+    const UUID_V4_REGEX =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return UUID_V4_REGEX.test(id);
   }
 
   private handleExceptions(error: PostgresError) {
