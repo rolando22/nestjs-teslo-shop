@@ -6,9 +6,9 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
-import { Product } from './entities/product.entity';
+import { Product, ProductImage } from './entities';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from '@common/dtos/pagination.dto';
@@ -25,6 +25,9 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
+    @InjectRepository(ProductImage)
+    private readonly productImageRepository: Repository<ProductImage>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async findAll(paginationDto: PaginationDto): Promise<Product[]> {
@@ -61,9 +64,17 @@ export class ProductsService {
   }
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
+    const { images = [], ...restCreateProductDto } = createProductDto;
+
     try {
-      const product = this.productRepository.create(createProductDto);
+      const product = this.productRepository.create({
+        ...restCreateProductDto,
+        images: images.map((image) =>
+          this.productImageRepository.create({ url: image }),
+        ),
+      });
       await this.productRepository.save(product);
+
       return product;
     } catch (error) {
       throw this.handleExceptions(error as PostgresError);
@@ -74,21 +85,38 @@ export class ProductsService {
     id: string,
     updateProductDto: UpdateProductDto,
   ): Promise<Product> {
+    const { images = [], ...restUpdateProductDto } = updateProductDto;
+
     const product = await this.productRepository.preload({
       id,
-      ...updateProductDto,
+      ...restUpdateProductDto,
     });
 
     if (!product) {
       throw new NotFoundException(`Product with id "${id}" not found`);
     }
 
-    try {
-      await this.productRepository.save(product);
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-      return product;
+    try {
+      if (images) {
+        await queryRunner.manager.delete(ProductImage, { product: { id } });
+        product.images = images.map((image) =>
+          this.productImageRepository.create({ url: image }),
+        );
+      }
+
+      const savedProduct = await queryRunner.manager.save(product);
+      await queryRunner.commitTransaction();
+
+      return savedProduct;
     } catch (error) {
+      await queryRunner.rollbackTransaction();
       throw this.handleExceptions(error as PostgresError);
+    } finally {
+      await queryRunner.release();
     }
   }
 
