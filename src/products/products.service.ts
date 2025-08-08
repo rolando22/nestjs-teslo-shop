@@ -126,6 +126,16 @@ export class ProductsService {
     return product;
   }
 
+  async deleteAll() {
+    const queryBuilder = this.productRepository.createQueryBuilder('product');
+
+    try {
+      return await queryBuilder.delete().where({}).execute();
+    } catch (error) {
+      throw this.handleExceptions(error as PostgresError);
+    }
+  }
+
   private isUUID(id: string): boolean {
     const UUID_V4_REGEX =
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;

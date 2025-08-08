@@ -22,3 +22,8 @@ docker compose up -d
 ```
 npm run start:dev
 ```
+
+7. Popular base de datos.
+```
+http://localhost:3001/seed
+```
