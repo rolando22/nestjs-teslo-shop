@@ -27,3 +27,5 @@ npm run start:dev
 ```
 http://localhost:3001/seed
 ```
+
+8. Descargar las [imágenes](https://import.cdn.thinkific.com/643563/courses/1939714/products-220722-161630.zip) y guardarlas dentro de `static/products`.
