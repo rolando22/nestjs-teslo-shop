@@ -60,4 +60,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 postgres-data/
 
 # Files
-static/
+static/products/*.jpg
+static/products/*.jpeg
+static/products/*.png
+static/products/*.gif
