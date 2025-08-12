@@ -11,6 +11,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
+      "@auth/*": ["src/auth/*"],
       "@common/*": ["src/common/*"],
       "@files/*": ["src/files/*"],
       "@products/*": ["src/products/*"],
