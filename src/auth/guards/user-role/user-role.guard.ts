@@ -10,6 +10,9 @@ import { Request } from 'express';
 import { Observable } from 'rxjs';
 import { User } from '@auth/entities/user.entity';
 
+import { META_ROLES } from '@auth/decorators';
+import { Role } from '@auth/enums/role.enum';
+
 @Injectable()
 export class UserRoleGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
@@ -17,8 +20,8 @@ export class UserRoleGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const validRoles = this.reflector.get<string[]>(
-      'roles',
+    const validRoles = this.reflector.get<Role[]>(
+      META_ROLES,
       context.getHandler(),
     );
 

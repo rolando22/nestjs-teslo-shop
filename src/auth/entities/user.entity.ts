@@ -1,6 +1,8 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
+import { Role } from '@auth/enums/role.enum';
+
 @Entity({ name: 'users' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -20,5 +22,5 @@ export class User {
   isActive: boolean;
 
   @Column({ type: 'text', array: true, default: ['user'] })
-  roles: string[];
+  roles: Role[];
 }

@@ -14,6 +14,8 @@ import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from '@common/dtos/pagination.dto';
+import { Auth } from '@auth/decorators';
+import { Role } from '@auth/enums/role.enum';
 
 @Controller('products')
 export class ProductsController {
@@ -38,6 +40,7 @@ export class ProductsController {
   }
 
   @Post()
+  @Auth(Role.ADMIN)
   async create(@Body() createProductDto: CreateProductDto) {
     const newProduct = await this.productsService.create(createProductDto);
 
@@ -48,6 +51,7 @@ export class ProductsController {
   }
 
   @Patch(':id')
+  @Auth(Role.ADMIN)
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductDto: UpdateProductDto,
@@ -61,6 +65,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @Auth(Role.ADMIN)
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     const product = await this.productsService.remove(id);
 
