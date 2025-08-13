@@ -6,10 +6,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 import { BcryptAdapter } from './adapters/bcrypt.adapter';
 import { User } from './entities/user.entity';
 import { LoginDto, RegisterDto } from './dto';
+
+import type { JwtPayload } from './interfaces/jwt-payload.interface';
 
 interface PostgresError extends Error {
   code: string;
@@ -23,9 +26,10 @@ export class AuthService {
   constructor(
     @InjectRepository(User) private readonly userReposity: Repository<User>,
     private readonly encrypt: BcryptAdapter,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<User> {
+  async register(registerDto: RegisterDto): Promise<User & { token: string }> {
     try {
       const user = this.userReposity.create({
         ...registerDto,
@@ -34,13 +38,16 @@ export class AuthService {
 
       await this.userReposity.save(user);
 
-      return user;
+      return {
+        ...user,
+        token: this.generateJwt({ id: user.id }),
+      };
     } catch (error) {
       throw this.handleExceptions(error as PostgresError);
     }
   }
 
-  async login(loginDto: LoginDto): Promise<User> {
+  async login(loginDto: LoginDto): Promise<User & { token: string }> {
     const { email, password } = loginDto;
 
     const user = await this.userReposity.findOneBy({ email });
@@ -53,7 +60,15 @@ export class AuthService {
       throw new BadRequestException('Invalid credentials.');
     }
 
-    return user;
+    return {
+      ...user,
+      token: this.generateJwt({ id: user.id }),
+    };
+  }
+
+  private generateJwt(payload: JwtPayload) {
+    const token = this.jwtService.sign(payload);
+    return token;
   }
 
   private handleExceptions(error: PostgresError) {
