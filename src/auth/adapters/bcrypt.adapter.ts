@@ -10,4 +10,8 @@ export class BcryptAdapter implements EncryptAdapter {
   hashSync(data: string | Buffer, saltOrRounds: string | number): string {
     return this.bcrypt.hashSync(data, saltOrRounds);
   }
+
+  compareSync(data: string | Buffer, encrypted: string): boolean {
+    return this.bcrypt.compareSync(data, encrypted);
+  }
 }

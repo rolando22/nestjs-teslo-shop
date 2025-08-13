@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 
 import { BcryptAdapter } from './adapters/bcrypt.adapter';
 import { User } from './entities/user.entity';
-import { RegisterDto } from './dto/register.dto';
+import { LoginDto, RegisterDto } from './dto';
 
 interface PostgresError extends Error {
   code: string;
@@ -38,6 +38,22 @@ export class AuthService {
     } catch (error) {
       throw this.handleExceptions(error as PostgresError);
     }
+  }
+
+  async login(loginDto: LoginDto): Promise<User> {
+    const { email, password } = loginDto;
+
+    const user = await this.userReposity.findOneBy({ email });
+
+    if (!user) {
+      throw new BadRequestException('Invalid credentials.');
+    }
+
+    if (!this.encrypt.compareSync(password, user.password)) {
+      throw new BadRequestException('Invalid credentials.');
+    }
+
+    return user;
   }
 
   private handleExceptions(error: PostgresError) {
