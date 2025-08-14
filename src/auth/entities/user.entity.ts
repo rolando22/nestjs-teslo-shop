@@ -1,6 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Exclude } from 'class-transformer';
 
+import { Product } from '@products/entities';
 import { Role } from '@auth/enums/role.enum';
 
 @Entity({ name: 'users' })
@@ -23,4 +31,22 @@ export class User {
 
   @Column({ type: 'text', array: true, default: ['user'] })
   roles: Role[];
+
+  @OneToMany(() => Product, (product) => product.user)
+  products: Product[];
+
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @Exclude()
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 }

@@ -6,7 +6,7 @@ import { SeedService } from './seed.service';
 import { SeedController } from './seed.controller';
 
 @Module({
-  imports: [ProductsModule, AuthModule],
+  imports: [AuthModule, ProductsModule],
   controllers: [SeedController],
   providers: [SeedService],
 })

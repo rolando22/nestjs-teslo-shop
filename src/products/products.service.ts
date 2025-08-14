@@ -9,8 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 
 import { Product, ProductImage } from './entities';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto, UpdateProductDto } from './dto';
+import { User } from '@auth/entities/user.entity';
 import { PaginationDto } from '@common/dtos/pagination.dto';
 
 interface PostgresError extends Error {
@@ -63,7 +63,10 @@ export class ProductsService {
     return product;
   }
 
-  async create(createProductDto: CreateProductDto): Promise<Product> {
+  async create(
+    createProductDto: CreateProductDto,
+    user: User,
+  ): Promise<Product> {
     const { images = [], ...restCreateProductDto } = createProductDto;
 
     try {
@@ -72,6 +75,7 @@ export class ProductsService {
         images: images.map((image) =>
           this.productImageRepository.create({ url: image }),
         ),
+        user,
       });
       await this.productRepository.save(product);
 
@@ -84,6 +88,7 @@ export class ProductsService {
   async update(
     id: string,
     updateProductDto: UpdateProductDto,
+    user: User,
   ): Promise<Product> {
     const { images = [], ...restUpdateProductDto } = updateProductDto;
 
@@ -108,6 +113,7 @@ export class ProductsService {
         );
       }
 
+      product.user = user;
       const savedProduct = await queryRunner.manager.save(product);
       await queryRunner.commitTransaction();
 

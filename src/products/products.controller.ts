@@ -11,10 +11,10 @@ import {
 } from '@nestjs/common';
 
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
+import { CreateProductDto, UpdateProductDto } from './dto';
+import { User } from '@auth/entities/user.entity';
 import { PaginationDto } from '@common/dtos/pagination.dto';
-import { Auth } from '@auth/decorators';
+import { Auth, GetUser } from '@auth/decorators';
 import { Role } from '@auth/enums/role.enum';
 
 @Controller('products')
@@ -40,9 +40,15 @@ export class ProductsController {
   }
 
   @Post()
-  @Auth(Role.ADMIN)
-  async create(@Body() createProductDto: CreateProductDto) {
-    const newProduct = await this.productsService.create(createProductDto);
+  @Auth()
+  async create(
+    @Body() createProductDto: CreateProductDto,
+    @GetUser() user: User,
+  ) {
+    const newProduct = await this.productsService.create(
+      createProductDto,
+      user,
+    );
 
     return {
       message: 'Product created successfully',
@@ -51,12 +57,17 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  @Auth(Role.ADMIN)
+  @Auth()
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductDto: UpdateProductDto,
+    @GetUser() user: User,
   ) {
-    const product = await this.productsService.update(id, updateProductDto);
+    const product = await this.productsService.update(
+      id,
+      updateProductDto,
+      user,
+    );
 
     return {
       message: 'Product updated successfully',

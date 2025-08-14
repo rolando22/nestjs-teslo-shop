@@ -1,3 +1,5 @@
+import { Role } from '@auth/enums/role.enum';
+
 interface SeedProduct {
   description: string;
   images: string[];
@@ -14,11 +16,33 @@ interface SeedProduct {
 type ValidSizes = 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
 type ValidTypes = 'shirts' | 'pants' | 'hoodies' | 'hats';
 
+interface SeedUser {
+  email: string;
+  fullName: string;
+  password: string;
+  roles: Role[];
+}
+
 interface SeedData {
+  users: SeedUser[];
   products: SeedProduct[];
 }
 
 export const initialData: SeedData = {
+  users: [
+    {
+      email: 'test1@gmail.com',
+      fullName: 'Test One',
+      password: 'Prueba123',
+      roles: [Role.ADMIN],
+    },
+    {
+      email: 'test2@gmail.com',
+      fullName: 'Test Two',
+      password: 'Prueba123',
+      roles: [Role.USER, Role.SUPERUSER],
+    },
+  ],
   products: [
     {
       description:

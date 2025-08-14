@@ -2,13 +2,18 @@ import {
   BeforeInsert,
   BeforeUpdate,
   Column,
+  CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
 
 import { ProductImage } from './';
+import { User } from '@auth/entities/user.entity';
 
 @Entity({ name: 'products' })
 export class Product {
@@ -45,6 +50,25 @@ export class Product {
   })
   @Exclude()
   images?: ProductImage[];
+
+  @ManyToOne(() => User, (user) => user.products, { eager: true })
+  @JoinColumn({ name: 'user_id' })
+  user: User;
+
+  @CreateDateColumn({
+    name: 'created_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @Exclude()
+  @UpdateDateColumn({
+    name: 'updated_at',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
 
   @Expose()
   get imagesUrl() {
