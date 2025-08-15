@@ -29,7 +29,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<User & { token: string }> {
+  async register(
+    registerDto: RegisterDto,
+  ): Promise<{ user: User; token: string }> {
     try {
       const user = this.userReposity.create({
         ...registerDto,
@@ -39,7 +41,7 @@ export class AuthService {
       await this.userReposity.save(user);
 
       return {
-        ...user,
+        user,
         token: this.generateJwt({ id: user.id }),
       };
     } catch (error) {
@@ -47,7 +49,7 @@ export class AuthService {
     }
   }
 
-  async login(loginDto: LoginDto): Promise<User & { token: string }> {
+  async login(loginDto: LoginDto): Promise<{ user: User; token: string }> {
     const { email, password } = loginDto;
 
     const user = await this.userReposity.findOneBy({ email });
@@ -61,7 +63,14 @@ export class AuthService {
     }
 
     return {
-      ...user,
+      user,
+      token: this.generateJwt({ id: user.id }),
+    };
+  }
+
+  checkStatus(user: User): { user: User; token: string } {
+    return {
+      user,
       token: this.generateJwt({ id: user.id }),
     };
   }
