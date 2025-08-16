@@ -10,10 +10,12 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
+import { ApiResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 import { diskStorage } from 'multer';
 
 import { FilesService } from './files.service';
+import { ProductImage } from '@products/entities';
 import { fileFilter, fileNamer } from './helpers';
 
 @Controller('files')
@@ -24,6 +26,12 @@ export class FilesController {
   ) {}
 
   @Get('/product/:imageName')
+  @ApiResponse({
+    status: 200,
+    description: 'Get one product image.',
+    type: ProductImage,
+  })
+  @ApiResponse({ status: 404, description: 'Product image not found.' })
   findOneProductImage(
     @Res() res: Response,
     @Param('imageName') imageName: string,
@@ -34,6 +42,11 @@ export class FilesController {
   }
 
   @Post('product')
+  @ApiResponse({
+    status: 201,
+    description: 'Upload product image.',
+    type: ProductImage,
+  })
   @UseInterceptors(
     FileInterceptor('file', {
       fileFilter,

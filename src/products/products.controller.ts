@@ -9,10 +9,12 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
+import { ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 import { ProductsService } from './products.service';
-import { CreateProductDto, UpdateProductDto } from './dto';
+import { Product } from './entities';
 import { User } from '@auth/entities/user.entity';
+import { CreateProductDto, UpdateProductDto } from './dto';
 import { PaginationDto } from '@common/dtos/pagination.dto';
 import { Auth, GetUser } from '@auth/decorators';
 import { Role } from '@auth/enums/role.enum';
@@ -22,7 +24,23 @@ export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Get()
-  async findAll(@Query() paginationDto: PaginationDto) {
+  @ApiResponse({
+    status: 200,
+    description: 'Get all products.',
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'array',
+          items: { $ref: getSchemaPath(Product) },
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  async findAll(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<{ data: Product[] }> {
     const products = await this.productsService.findAll(paginationDto);
 
     return {
@@ -31,7 +49,18 @@ export class ProductsController {
   }
 
   @Get(':term')
-  async findOne(@Param('term') term: string) {
+  @ApiResponse({
+    status: 200,
+    description: 'Get one product.',
+    schema: {
+      type: 'object',
+      properties: {
+        data: { $ref: getSchemaPath(Product) },
+      },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Product not found.' })
+  async findOne(@Param('term') term: string): Promise<{ data: Product }> {
     const product = await this.productsService.findOne(term);
 
     return {
@@ -40,11 +69,24 @@ export class ProductsController {
   }
 
   @Post()
-  @Auth()
+  @Auth(Role.ADMIN)
+  @ApiResponse({
+    status: 201,
+    description: 'Create product.',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Product created successfully' },
+        data: { $ref: getSchemaPath(Product) },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 403, description: 'Forbidden. Invalid token.' })
   async create(
     @Body() createProductDto: CreateProductDto,
     @GetUser() user: User,
-  ) {
+  ): Promise<{ message: string; data: Product }> {
     const newProduct = await this.productsService.create(
       createProductDto,
       user,
@@ -57,12 +99,26 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  @Auth()
+  @Auth(Role.ADMIN)
+  @ApiResponse({
+    status: 200,
+    description: 'Updated product.',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Product updated successfully' },
+        data: { $ref: getSchemaPath(Product) },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 403, description: 'Forbidden. Invalid token.' })
+  @ApiResponse({ status: 404, description: 'Product not found.' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductDto: UpdateProductDto,
     @GetUser() user: User,
-  ) {
+  ): Promise<{ message: string; data: Product }> {
     const product = await this.productsService.update(
       id,
       updateProductDto,
@@ -77,7 +133,23 @@ export class ProductsController {
 
   @Delete(':id')
   @Auth(Role.ADMIN)
-  async remove(@Param('id', ParseUUIDPipe) id: string) {
+  @ApiResponse({
+    status: 200,
+    description: 'Delete product.',
+    schema: {
+      type: 'object',
+      properties: {
+        message: { type: 'string', example: 'Product deleted successfully' },
+        data: { $ref: getSchemaPath(Product) },
+      },
+    },
+  })
+  @ApiResponse({ status: 400, description: 'Bad request.' })
+  @ApiResponse({ status: 403, description: 'Forbidden. Invalid token.' })
+  @ApiResponse({ status: 404, description: 'Product not found.' })
+  async remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<{ message: string; data: Product }> {
     const product = await this.productsService.remove(id);
 
     return {
