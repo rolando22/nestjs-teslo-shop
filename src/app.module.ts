@@ -1,8 +1,8 @@
-import { Logger, Module } from '@nestjs/common';
-import { ConfigModule, ConfigType } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 
 import { AuthModule } from '@auth/auth.module';
+import { DatabaseModule } from '@database/database.module';
 import { CommonModule } from '@common/common.module';
 import { FilesModule } from '@files/files.module';
 import { ProductsModule } from '@products/products.module';
@@ -17,35 +17,7 @@ import { envConfigurationSchema } from '@config/app-config.schema';
       validationSchema: envConfigurationSchema,
       isGlobal: true,
     }),
-    TypeOrmModule.forRootAsync({
-      useFactory: (config: ConfigType<typeof envConfiguration>) => {
-        const logger = new Logger('Postgres');
-
-        const {
-          postgresHost,
-          postgresPort,
-          postgresdb,
-          postgresUser,
-          postgresPassword,
-        } = config;
-
-        logger.log(
-          `Database connected into ${postgresdb} on port ${postgresPort}`,
-        );
-
-        return {
-          type: 'postgres',
-          host: postgresHost,
-          port: postgresPort,
-          database: postgresdb,
-          username: postgresUser,
-          password: postgresPassword,
-          autoLoadEntities: true,
-          synchronize: true,
-        };
-      },
-      inject: [envConfiguration.KEY],
-    }),
+    DatabaseModule,
     AuthModule,
     CommonModule,
     FilesModule,
