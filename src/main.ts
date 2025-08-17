@@ -8,6 +8,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 import { Product } from '@products/entities';
+import { User } from '@auth/entities/user.entity';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,7 +28,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .build();
   const documentFactory = () =>
-    SwaggerModule.createDocument(app, config, { extraModels: [Product] });
+    SwaggerModule.createDocument(app, config, { extraModels: [Product, User] });
   SwaggerModule.setup('api', app, documentFactory);
 
   await app.listen(process.env.PORT ?? 3000, () => {

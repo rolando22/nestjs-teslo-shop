@@ -29,7 +29,6 @@ export class FilesController {
   @ApiResponse({
     status: 200,
     description: 'Get one product image.',
-    type: ProductImage,
   })
   @ApiResponse({ status: 404, description: 'Product image not found.' })
   findOneProductImage(
