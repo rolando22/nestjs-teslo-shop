@@ -1,5 +1,6 @@
-import { Environment } from '@common/enums/enviroment.enum';
 import { registerAs } from '@nestjs/config';
+
+import { Environment } from '@common/enums/enviroment.enum';
 
 export default registerAs('config', () => ({
   // APP

@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
-import { ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { User } from './entities/user.entity';
@@ -72,6 +72,7 @@ export class AuthController {
 
   @Get('check-status')
   @Auth()
+  @ApiBearerAuth('access-token')
   @ApiResponse({
     status: 200,
     description: 'Check status.',

@@ -26,6 +26,17 @@ async function bootstrap() {
     .setTitle('Teslo Shop RESTful API')
     .setDescription('Teslo Shop endpoints')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
   const documentFactory = () =>
     SwaggerModule.createDocument(app, config, { extraModels: [Product, User] });

@@ -9,7 +9,7 @@ import {
   ParseUUIDPipe,
   Query,
 } from '@nestjs/common';
-import { ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 import { ProductsService } from './products.service';
 import { Product } from './entities';
@@ -70,6 +70,7 @@ export class ProductsController {
 
   @Post()
   @Auth(Role.ADMIN)
+  @ApiBearerAuth('access-token')
   @ApiResponse({
     status: 201,
     description: 'Create product.',
@@ -82,7 +83,11 @@ export class ProductsController {
     },
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
-  @ApiResponse({ status: 403, description: 'Forbidden. Invalid token.' })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden. Invalid token. Only ADMIN role can access this endpoint.',
+  })
   async create(
     @Body() createProductDto: CreateProductDto,
     @GetUser() user: User,
@@ -100,6 +105,7 @@ export class ProductsController {
 
   @Patch(':id')
   @Auth(Role.ADMIN)
+  @ApiBearerAuth('access-token')
   @ApiResponse({
     status: 200,
     description: 'Updated product.',
@@ -112,7 +118,11 @@ export class ProductsController {
     },
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
-  @ApiResponse({ status: 403, description: 'Forbidden. Invalid token.' })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden. Invalid token. Only ADMIN role can access this endpoint.',
+  })
   @ApiResponse({ status: 404, description: 'Product not found.' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -133,6 +143,7 @@ export class ProductsController {
 
   @Delete(':id')
   @Auth(Role.ADMIN)
+  @ApiBearerAuth('access-token')
   @ApiResponse({
     status: 200,
     description: 'Delete product.',
@@ -145,7 +156,11 @@ export class ProductsController {
     },
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
-  @ApiResponse({ status: 403, description: 'Forbidden. Invalid token.' })
+  @ApiResponse({
+    status: 403,
+    description:
+      'Forbidden. Invalid token. Only ADMIN role can access this endpoint.',
+  })
   @ApiResponse({ status: 404, description: 'Product not found.' })
   async remove(
     @Param('id', ParseUUIDPipe) id: string,
