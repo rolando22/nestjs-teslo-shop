@@ -13,6 +13,7 @@
     "paths": {
       "@auth/*": ["src/auth/*"],
       "@common/*": ["src/common/*"],
+      "@config/*": ["src/config/*"],
       "@files/*": ["src/files/*"],
       "@products/*": ["src/products/*"],
       "@seed/*": ["src/seed/*"]
