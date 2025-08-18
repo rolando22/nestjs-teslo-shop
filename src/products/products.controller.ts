@@ -14,8 +14,7 @@ import { ApiBearerAuth, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
 import { Product } from './entities';
 import { User } from '@auth/entities/user.entity';
-import { CreateProductDto, UpdateProductDto } from './dto';
-import { PaginationDto } from '@common/dtos/pagination.dto';
+import { CreateProductDto, FilterProductDto, UpdateProductDto } from './dto';
 import { Auth, GetUser } from '@auth/decorators';
 import { Role } from '@auth/enums/role.enum';
 
@@ -39,9 +38,9 @@ export class ProductsController {
   })
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async findAll(
-    @Query() paginationDto: PaginationDto,
+    @Query() filterProductDto: FilterProductDto,
   ): Promise<{ data: Product[] }> {
-    const products = await this.productsService.findAll(paginationDto);
+    const products = await this.productsService.findAll(filterProductDto);
 
     return {
       data: products,

@@ -6,12 +6,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import {
+  DataSource,
+  Equal,
+  FindOptionsWhere,
+  ILike,
+  Repository,
+} from 'typeorm';
 
 import { Product, ProductImage } from './entities';
-import { CreateProductDto, UpdateProductDto } from './dto';
+import { CreateProductDto, FilterProductDto, UpdateProductDto } from './dto';
 import { User } from '@auth/entities/user.entity';
-import { PaginationDto } from '@common/dtos/pagination.dto';
 
 interface PostgresError extends Error {
   code: string;
@@ -30,10 +35,21 @@ export class ProductsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll(paginationDto: PaginationDto): Promise<Product[]> {
-    const { limit = 10, offset = 0 } = paginationDto;
+  async findAll(filterProductDto: FilterProductDto): Promise<Product[]> {
+    const { limit = 10, offset = 0, gender, title } = filterProductDto;
+
+    const where: FindOptionsWhere<Product> = {};
+
+    if (title) {
+      where.title = ILike(`%${title}%`);
+    }
+
+    if (gender) {
+      where.gender = Equal(gender);
+    }
 
     const products = await this.productRepository.find({
+      where,
       take: limit,
       skip: offset,
     });
