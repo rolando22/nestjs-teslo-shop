@@ -42,6 +42,8 @@ async function bootstrap() {
     SwaggerModule.createDocument(app, config, { extraModels: [Product, User] });
   SwaggerModule.setup('api', app, documentFactory);
 
+  app.enableCors();
+
   await app.listen(process.env.PORT ?? 3000, () => {
     logger.log(`Server is running on port ${process.env.PORT ?? 3000}`);
   });
