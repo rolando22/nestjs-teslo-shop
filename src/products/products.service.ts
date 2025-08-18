@@ -35,7 +35,9 @@ export class ProductsService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAll(filterProductDto: FilterProductDto): Promise<Product[]> {
+  async findAll(
+    filterProductDto: FilterProductDto,
+  ): Promise<{ count: number; pages: number; products: Product[] }> {
     const { limit = 10, offset = 0, gender, title } = filterProductDto;
 
     const where: FindOptionsWhere<Product> = {};
@@ -54,7 +56,15 @@ export class ProductsService {
       skip: offset,
     });
 
-    return products;
+    const totalProducts = await this.productRepository.count({
+      where,
+    });
+
+    return {
+      count: totalProducts,
+      pages: Math.ceil(totalProducts / limit),
+      products,
+    };
   }
 
   async findOne(term: string): Promise<Product> {

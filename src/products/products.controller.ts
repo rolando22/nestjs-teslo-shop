@@ -30,8 +30,20 @@ export class ProductsController {
       type: 'object',
       properties: {
         data: {
-          type: 'array',
-          items: { $ref: getSchemaPath(Product) },
+          properties: {
+            count: {
+              type: 'number',
+              example: 50,
+            },
+            pages: {
+              type: 'number',
+              example: 10,
+            },
+            products: {
+              type: 'array',
+              items: { $ref: getSchemaPath(Product) },
+            },
+          },
         },
       },
     },
@@ -39,11 +51,11 @@ export class ProductsController {
   @ApiResponse({ status: 400, description: 'Bad request.' })
   async findAll(
     @Query() filterProductDto: FilterProductDto,
-  ): Promise<{ data: Product[] }> {
-    const products = await this.productsService.findAll(filterProductDto);
+  ): Promise<{ data: { count: number; pages: number; products: Product[] } }> {
+    const data = await this.productsService.findAll(filterProductDto);
 
     return {
-      data: products,
+      data,
     };
   }
 
