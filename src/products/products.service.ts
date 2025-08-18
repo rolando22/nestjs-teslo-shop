@@ -6,13 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  DataSource,
-  Equal,
-  FindOptionsWhere,
-  ILike,
-  Repository,
-} from 'typeorm';
+import { DataSource, FindOptionsWhere, ILike, In, Repository } from 'typeorm';
 
 import { Product, ProductImage } from './entities';
 import { CreateProductDto, FilterProductDto, UpdateProductDto } from './dto';
@@ -47,7 +41,7 @@ export class ProductsService {
     }
 
     if (gender) {
-      where.gender = Equal(gender);
+      where.gender = In([gender, 'unisex']);
     }
 
     const products = await this.productRepository.find({
