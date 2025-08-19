@@ -67,9 +67,11 @@ export class ProductsService {
     if (this.isUUID(term)) {
       product = await this.productRepository.findOneBy({ id: term });
     } else {
-      const queryBuilder = this.productRepository.createQueryBuilder();
+      const queryBuilder = this.productRepository.createQueryBuilder('product');
       product = await queryBuilder
-        .where('UPPER(title) =:title or slug =:slug', {
+        .leftJoinAndSelect('product.images', 'images')
+        .leftJoinAndSelect('product.user', 'user')
+        .where('UPPER(product.title) =:title OR product.slug =:slug', {
           title: term.toUpperCase(),
           slug: term.toLowerCase(),
         })

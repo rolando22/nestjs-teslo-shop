@@ -71,11 +71,11 @@ export class Product {
   @Column({ type: 'text', array: true, default: [] })
   tags: string[];
 
+  @Exclude()
   @OneToMany(() => ProductImage, (productImage) => productImage.product, {
     cascade: true,
     eager: true,
   })
-  @Exclude()
   images?: ProductImage[];
 
   @ManyToOne(() => User, (user) => user.products, { eager: true })
