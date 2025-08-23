@@ -15,7 +15,6 @@ import { Response } from 'express';
 import { diskStorage } from 'multer';
 
 import { FilesService } from './files.service';
-import { ProductImage } from '@products/entities';
 import { fileFilter, fileNamer } from './helpers';
 
 @Controller('files')
@@ -44,7 +43,24 @@ export class FilesController {
   @ApiResponse({
     status: 201,
     description: 'Upload product image.',
-    type: ProductImage,
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          properties: {
+            secureUrl: {
+              type: 'string',
+              example:
+                '[HOST]/api/files/product/48dfe7e4-5747-47cd-9d95-476ab8b43aa5.jpeg',
+            },
+            fileName: {
+              type: 'string',
+              example: '48dfe7e4-5747-47cd-9d95-476ab8b43aa5.jpeg',
+            },
+          },
+        },
+      },
+    },
   })
   @UseInterceptors(
     FileInterceptor('file', {
@@ -61,9 +77,13 @@ export class FilesController {
     }
 
     const secureUrl = `${this.configService.get('HOST_API')}/files/product/${file.filename}`;
+    const fileName = file.filename;
 
     return {
-      data: { secureUrl },
+      data: {
+        secureUrl,
+        fileName,
+      },
     };
   }
 }
