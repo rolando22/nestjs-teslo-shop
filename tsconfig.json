@@ -16,6 +16,7 @@
       "@config/*": ["src/config/*"],
       "@database/*": ["src/database/*"],
       "@files/*": ["src/files/*"],
+      "@messages-ws/*": ["src/messages-ws/*"],
       "@products/*": ["src/products/*"],
       "@seed/*": ["src/seed/*"]
     },
